@@ -10,6 +10,16 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, log_loss
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
+from sklearn.utils._testing import assert_almost_equal
+from sklearn.utils._testing import assert_allclose
+from sklearn.utils._testing import assert_array_almost_equal
+from sklearn.utils._testing import assert_array_equal
+from sklearn.utils._testing import assert_raise_message
+from sklearn.utils._testing import assert_raises
+from sklearn.utils._testing import assert_warns
+from sklearn.utils._testing import ignore_warnings
+from sklearn.utils._testing import assert_warns_message
+
 
 class DrLogisticRegression:
     """DATA ROBBOT wraper around a regularized LogisticRegression estimator"""
@@ -314,6 +324,57 @@ def lending_club_demo():
     pr = dr.predict_proba(X_test)
     ev = dr.evaluate(X_test, y_test.values)
 
+# uni is reproducible
+def test_reproducible():
+    from sklearn.datasets import load_iris
+    iris = load_iris()
+    cols = [ '_'.join(ft.split()[:2] ) for ft in iris.feature_names]
+    df = pd.DataFrame(data=iris.data, columns=cols)
+    y = (iris.target != 2).astype(int)
+    X_train, X_test, y_train, y_test = train_test_split(df, y, random_state=0)
+
+    dr1 = DrLogisticRegression()
+    dr1.fit(X_train, y_train)
+    y_pred1 = dr1.predict(X_test)
+    f11 = f1_score(y_test, y_pred1)
+
+    dr2 = DrLogisticRegression()
+    dr2.fit(X_train, y_train)
+    y_pred2 = dr2.predict(X_test)
+    f12 = f1_score(y_test, y_pred2)
+
+    dr3 = DrLogisticRegression()
+    dr3.fit(X_train, y_train)
+    y_pred3 = dr3.predict(X_test)
+    f13 = f1_score(y_test, y_pred3)
+
+    assert_array_equal(y_pred1, y_pred2)
+    assert_array_equal(y_pred1, y_pred3)
+    assert_almost_equal(f11, f12)
+    assert_almost_equal(f11, f13)
+
+def test_nulls():
+    from sklearn.datasets import load_iris
+    iris = load_iris()
+    cols = ['_'.join(ft.split()[:2]) for ft in iris.feature_names]
+    df = pd.DataFrame(data=iris.data, columns=cols)
+    y = (iris.target != 2).astype(int)
+    X_train, X_test, y_train, y_test = train_test_split(df, y, random_state=0)
+
+def test_output_format():
+    from sklearn.datasets import load_iris
+    iris = load_iris()
+    cols = ['_'.join(ft.split()[:2]) for ft in iris.feature_names]
+    df = pd.DataFrame(data=iris.data, columns=cols)
+    y = (iris.target != 2).astype(int)
+    X_train, X_test, y_train, y_test = train_test_split(df, y, random_state=0)
+
+
+# uni can handle new category levels  at prediction time
+# other useful unitest you can think of if time allows
+
 if __name__ == '__main__':
-    lending_club_demo()
+    #lending_club_demo()
+    #test_reproducible()
+    test_nulls()
     print('end')
