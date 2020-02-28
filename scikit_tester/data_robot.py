@@ -10,15 +10,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, log_loss
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
-INPUT_FILE = '/Users/ashacked/dev/python/ML/scikit_tester/DR_Demo_Lending_Club_reduced.csv'
-df = pd.read_csv(INPUT_FILE, na_values=['NA', 'na', 'NULL', 'null', 'nil'])
-features = df.drop('is_bad', axis = 1)
-
-X_train, X_test, y_train, y_test = train_test_split(features, df['is_bad'], random_state=0)
 
 class DrLogisticRegression:
     """DATA ROBBOT wraper around a regularized LogisticRegression estimator"""
-
     def __init__(self, remove_columns=[], replace_nulls={},
                  penalty=None, dual=None, tol=None, C=None,
                  fit_intercept=None, intercept_scaling=None, class_weight=None,
@@ -279,11 +273,18 @@ class DrLogisticRegression:
         # ! TBD use sparse matrix for features when many categorical columns
         return X
 
-dr = DrLogisticRegression(remove_columns=['Id'],
-                          replace_nulls={'mths_since_last_delinq': 1200, 'mths_since_last_record': 1200})
-pars = dr.tune_parameters(features, df['is_bad'])
-dr.fit(X_train, y_train.values)
-y = dr.predict(X_test)
-pr = dr.predict_proba(X_test)
-ev = dr.evaluate(X_test, y_test.values)
-print('end')
+if __name__ != '__main__':
+    INPUT_FILE = '/Users/ashacked/dev/python/ML/scikit_tester/DR_Demo_Lending_Club_reduced.csv'
+    df = pd.read_csv(INPUT_FILE, na_values=['NA', 'na', 'NULL', 'null', 'nil'])
+    features = df.drop('is_bad', axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(features, df['is_bad'], random_state=0)
+
+    dr = DrLogisticRegression(remove_columns=['Id'],
+                              replace_nulls={'mths_since_last_delinq': 1200, 'mths_since_last_record': 1200})
+    pars = dr.tune_parameters(features, df['is_bad'])
+    dr.fit(X_train, y_train.values)
+    y = dr.predict(X_test)
+    pr = dr.predict_proba(X_test)
+    ev = dr.evaluate(X_test, y_test.values)
+    print('end')
