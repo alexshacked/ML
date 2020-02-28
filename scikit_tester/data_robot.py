@@ -129,11 +129,11 @@ class DrLogisticRegression:
             fold_results = grid.cv_results_[f1_fold]
             avg_f1 = np.mean(fold_results)
             tuple = np.where(fold_results >= avg_f1)
-            avg_f1_ix = tuple[0][0]
+            avg_f1_ix = tuple[0][0] if len(tuple[0]) > 0 else 0
 
             max_f1 = np.max(fold_results)
             tuple = np.where(fold_results >= max_f1)
-            max_f1_ix = tuple[0][0]
+            max_f1_ix = tuple[0][0] if len(tuple[0]) > 0 else 0
             out = grid.cv_results_['params'][max_f1_ix]
 
             lgs_fold = ''.join([fold_prefix,'neg_log_loss'])
