@@ -110,7 +110,8 @@ class DrLogisticRegression:
                       'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
                       }
         scoring = ["f1", "neg_log_loss", "recall", "precision"]
-        kfold = StratifiedKFold(n_splits=5, shuffle=True)
+        num_folds = 5
+        kfold = StratifiedKFold(n_splits=num_folds, shuffle=True)
         grid = GridSearchCV(LogisticRegression(), param_grid=param_grid,
                             scoring=scoring, refit="f1", cv=kfold,
                             return_train_score=True)
@@ -120,7 +121,29 @@ class DrLogisticRegression:
         logloss = grid.cv_results_['mean_test_neg_log_loss'][grid.best_index_]
         score = {'f1_score': round(f1,2), 'logloss': round(logloss, 2)}
         res['scores'] = score
-        return res
+
+        results = {}
+        for i in range(num_folds):
+            fold_prefix = 'split{}_test_'.format(i)
+            f1_fold = ''.join([fold_prefix,'f1'])
+            fold_results = grid.cv_results_[f1_fold]
+            avg_f1 = np.mean(fold_results)
+            tuple = np.where(fold_results >= avg_f1)
+            avg_f1_ix = tuple[0][0]
+
+            max_f1 = np.max(fold_results)
+            tuple = np.where(fold_results >= max_f1)
+            max_f1_ix = tuple[0][0]
+            out = grid.cv_results_['params'][max_f1_ix]
+
+            lgs_fold = ''.join([fold_prefix,'neg_log_loss'])
+            lgs = grid.cv_results_[lgs_fold][avg_f1_ix]
+            scores = {'f1_score': round(avg_f1, 2), 'logloss': round(lgs, 2)}
+            out['scores'] = scores
+            results['fold_{}'.format(i+1)] = out
+
+        results['the_best'] = res
+        return results
 
     def _df_2_np_xy_train(self, df, y):
         """ creates an X data features numpy arrays from a pandas dataframe
