@@ -273,11 +273,14 @@ class DrLogisticRegression:
         # ! TBD use sparse matrix for features when many categorical columns
         return X
 
-if __name__ != '__main__':
-    INPUT_FILE = '/Users/ashacked/dev/python/ML/scikit_tester/DR_Demo_Lending_Club_reduced.csv'
+def lending_club_demo():
+    import os
+    data_file = 'DR_Demo_Lending_Club_reduced.csv'
+    directory = os.path.dirname(__file__) # put the data_file in the same location as the script
+    INPUT_FILE = '/'.join([directory, data_file])
+
     df = pd.read_csv(INPUT_FILE, na_values=['NA', 'na', 'NULL', 'null', 'nil'])
     features = df.drop('is_bad', axis=1)
-
     X_train, X_test, y_train, y_test = train_test_split(features, df['is_bad'], random_state=0)
 
     dr = DrLogisticRegression(remove_columns=['Id'],
@@ -287,4 +290,7 @@ if __name__ != '__main__':
     y = dr.predict(X_test)
     pr = dr.predict_proba(X_test)
     ev = dr.evaluate(X_test, y_test.values)
+
+if __name__ == '__main__':
+    lending_club_demo()
     print('end')
