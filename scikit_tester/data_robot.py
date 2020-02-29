@@ -246,24 +246,25 @@ class DrLogisticRegression:
         # we do not know the problem domain for which this classifier will be used.
         # so we cannot assume default values for NULL cells. Need to drop these rows.
         # We also receive default values for columns with NULLs from the user
-
-        # warn the user that rows with null values will be dropped
         df0 = df.copy()
-        a = df0.isnull().values
-        b = np.sum(a, axis=1)
-        c = np.where(b > 0)
-        if len(c[0]) > 0:
-            s = [str(n) for n in c[0]]
-            txl = ','.join(s)
-            msg = 'Following rows were excluded from processing because they contain NULL values:\n[{}]'.format(txl)
-            warnings.warn(msg)
-
         for c in self.remove_columns:
             if c in df0.columns:
                 df0.drop(c, axis=1, inplace=True)
         for c in self.replace_nulls:
             if c in df0.columns:
                 df0.fillna({c: self.replace_nulls[c]}, inplace=True)
+
+        # warn the user that rows with null values will be dropped
+        a = df0.isnull().values
+        b = np.sum(a, axis=1)
+        c = np.where(b > 0)
+        if len(c[0]) > 0:
+            s = [str(n) for n in c[0]]
+            txl = ','.join(s)
+            msg = 'Following rows were excluded from processing because they contain NULL values:\n[{}]'.format(
+                txl)
+            warnings.warn(msg)
+
         df1 = df0.dropna()
 
         # we deal with categorical columns using pandas.get_dummies
@@ -291,6 +292,7 @@ class DrLogisticRegression:
         # instead of a numpy array
         # ! TBD use sparse matrix for features when many categorical columns
         return X
+
 
 def lending_club_demo():
     import os
@@ -414,6 +416,7 @@ def test_output_format():
         assert 'f1_score' in one_fold['scores']
         assert 'logloss' in one_fold['scores']
 
+
 if __name__ == '__main__':
     from sklearn.utils._testing import assert_almost_equal
     from sklearn.utils._testing import assert_array_almost_equal
@@ -438,7 +441,12 @@ a. unitest - model can handle new category levels at prediction time
     to close at the training time, we need to use an unsupervised 
     algorithm like clustering for example.
     
-b. short answer 1
+b. unitest - suggest more unitests
+   one of the advantages of using scikit-learn LogisticRegression is that
+   we do not have to test this class and can rely on the unitesting by
+   the scikit-learn library linear_model/tests/test_logistic.py
+    
+c. short answer 1
    compare logistic regression with f1=0.6 vs. neural network with f1=0.63
    for the credit risk use case - problem set in  DR_Demo_Lending_Club_reduced.csv
    
@@ -462,7 +470,7 @@ b. short answer 1
    GPU to run the model. I think that for a potential client like  bank it is definetly
    worthwhile.
    
-c. short answer 2
+d. short answer 2
    a customer wants to know which features in the data set matter, meaning influence the 
    class label.
    a. use the  "analysis of variance" method to get the features that are mostly corelated
