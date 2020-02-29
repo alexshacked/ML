@@ -465,11 +465,21 @@ b. short answer 1
 c. short answer 2
    a customer wants to know which features in the data set matter, meaning influence the 
    class label.
-   a. use the  analysis of variance method to get the features that are mostly corelated
+   a. use the  "analysis of variance" method to get the features that are mostly corelated
    with the target label. It has the disadvantage that it looks at each feature in isolation
    and not at the contribution of several features together.
    In scikit-learn use sklearn.feature_selection.SelectPercentile to get a subset of  the
    initial data set with less features (only the significant ones)
    Then use these smaller data set (same #rows but less features) to train and test the 
    three models in the problem and take the one with the best f1.
+   
+   b. Or we can use a decision tree–based models that provide a feature_importances_ attribute, 
+   which directly encodes the importance of each feature. This has the advantage that it
+   looks at the impact of all feature together on the target label. Random forest
+   mentioned in the problem is such a tree-based model.
+   In scikit-learn use something like 
+   sklearn.feature_selection.SelectFromModel(sklearn.ensemble.RandomForestClassifier(...
+   
+   c. There is also the "iterative feature selection" method. This is more computer 
+   resources demanding.
 '''
