@@ -1,6 +1,3 @@
-#  from importlib import reload
-# reload(rb); from  scikit_tester.data_robot import *
-
 import numpy as np
 import pandas as pd
 import warnings
@@ -417,9 +414,6 @@ def test_output_format():
         assert 'f1_score' in one_fold['scores']
         assert 'logloss' in one_fold['scores']
 
-
-# unit can handle new category levels  at prediction time
-# other useful unitest you can think of if time allows
 if __name__ == '__main__':
     from sklearn.utils._testing import assert_almost_equal
     from sklearn.utils._testing import assert_array_almost_equal
@@ -430,3 +424,10 @@ if __name__ == '__main__':
     test_reproducible()
     test_nulls()
     test_output_format()
+
+'''
+comments:
+
+a. unitest - model can handel new category levels at prediction time
+
+'''
