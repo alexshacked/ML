@@ -10,17 +10,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, log_loss
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
-from sklearn.utils._testing import assert_almost_equal
-from sklearn.utils._testing import assert_allclose
-from sklearn.utils._testing import assert_array_almost_equal
-from sklearn.utils._testing import assert_array_equal
-from sklearn.utils._testing import assert_raise_message
-from sklearn.utils._testing import assert_raises
-from sklearn.utils._testing import assert_warns
-from sklearn.utils._testing import ignore_warnings
-from sklearn.utils._testing import assert_warns_message
-
-
 class DrLogisticRegression:
     """DATA ROBBOT wraper around a regularized LogisticRegression estimator"""
     def __init__(self, remove_columns=[], replace_nulls={},
@@ -432,6 +421,11 @@ def test_output_format():
 # unit can handle new category levels  at prediction time
 # other useful unitest you can think of if time allows
 if __name__ == '__main__':
+    from sklearn.utils._testing import assert_almost_equal
+    from sklearn.utils._testing import assert_array_almost_equal
+    from sklearn.utils._testing import assert_array_equal
+    from sklearn.utils._testing import assert_warns
+
     #lending_club_demo()
     test_reproducible()
     test_nulls()
