@@ -428,6 +428,37 @@ if __name__ == '__main__':
 '''
 comments:
 
-a. unitest - model can handel new category levels at prediction time
-
+a. unitest - model can handle new category levels at prediction time
+    This was one of the requirements for a unittest in the problem paper.
+    As far as I know, in a supervised model like classification the 
+    category labels have to be known at training time. That is when
+    the model learns them. At prediction time the model can only map 
+    a features vector to one of the labels learned at training.
+    In order to handle a ML problem where the categories set is hard
+    to close at the training time, we need to use an unsupervised 
+    algorithm like clustering for example.
+    
+b. short answer 1
+   compare logistic regression with f1=0.6 vs. neural network with f1=0.63
+   for the credit risk use case - problem set in  DR_Demo_Lending_Club_reduced.csv
+   
+   neural networks are notoriously performance demanding and that is one of the
+   reasons that they became practicle only after the GPUs (very strong CPUs) were
+   introduced and deep networks with many neuron layers could be created. so, from 
+   a time/resources standpoint the Logistic Regression is certainly preferable.
+   But there is also the model perfomance side.
+   This kind of problem requires a recall close to 1.
+   recall = TP / (TP + FN)
+   That means we cannot afford that a positive instance, one that is a credit risk will
+   not be recognized. The financial crisis in 2008 caused by many mortgage defaults shows
+   us that. We must strive for a recall as close to 1 as possible. this means FN close to 
+   zero.
+   The recall is hidden inside the f1 formula
+   f1 = 2 * precision * recall /(precision+recall)
+   so, the fact that the neural network has a higher f1 could be either because it has a 
+   higher precision or because it has a higher recall. we do not know exactly from the
+   problem. but we cannot take the risk. recall is much to important here.
+   So I would go for the neural network with the higher f1=0.63, and use a (more expensive)
+   GPU to run the model. I think that for a potential client like  bank it is definetly
+   worthwhile.
 '''
