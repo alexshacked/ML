@@ -461,4 +461,15 @@ b. short answer 1
    So I would go for the neural network with the higher f1=0.63, and use a (more expensive)
    GPU to run the model. I think that for a potential client like  bank it is definetly
    worthwhile.
+   
+c. short answer 2
+   a customer wants to know which features in the data set matter, meaning influence the 
+   class label.
+   a. use the  analysis of variance method to get the features that are mostly corelated
+   with the target label. It has the disadvantage that it looks at each feature in isolation
+   and not at the contribution of several features together.
+   In scikit-learn use sklearn.feature_selection.SelectPercentile to get a subset of  the
+   initial data set with less features (only the significant ones)
+   Then use these smaller data set (same #rows but less features) to train and test the 
+   three models in the problem and take the one with the best f1.
 '''
