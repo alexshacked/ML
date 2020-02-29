@@ -324,7 +324,6 @@ def lending_club_demo():
     pr = dr.predict_proba(X_test)
     ev = dr.evaluate(X_test, y_test.values)
 
-# uni is reproducible
 def test_reproducible():
     from sklearn.datasets import load_iris
     iris = load_iris()
@@ -354,12 +353,48 @@ def test_reproducible():
     assert_almost_equal(f11, f13)
 
 def test_nulls():
+    from numpy import nan as NA
     from sklearn.datasets import load_iris
+
     iris = load_iris()
     cols = ['_'.join(ft.split()[:2]) for ft in iris.feature_names]
     df = pd.DataFrame(data=iris.data, columns=cols)
     y = (iris.target != 2).astype(int)
     X_train, X_test, y_train, y_test = train_test_split(df, y, random_state=0)
+
+    dr1 = DrLogisticRegression()
+    dr1.fit(X_train, y_train)
+    ac = dr1.clf.coef_[0]
+
+    X_train_n = X_train.copy()
+    X_train_n.iloc[0, 0] = NA
+    X_train_n.iloc[1, 0] = NA
+    X_train_n.iloc[1, 1] = NA
+    # test we set NaN correctly
+    assert (np.isnan(X_train_n.iloc[1, 1]) == True)
+    assert (np.isnan(X_train_n.iloc[1, 2]) == False)
+
+    dr2 = DrLogisticRegression()
+    dr2.fit(X_train_n, y_train)
+    bc = dr2.clf.coef_[0]
+    # test that after removing a small amount of NULL rows
+    # we still get a valid model
+    assert_array_almost_equal(ac, bc, decimal=2)
+
+    X_test_n = X_test.copy()
+    X_test_n.iloc[0, 0] = NA
+    X_test_n.iloc[1, 0] = NA
+    X_test_n.iloc[1, 1] = NA
+    y_pred_n = dr2.predict(X_test_n)
+    # test that during prediction null rows are removed and prediction
+    # is performed only on the valid rows
+    assert y_test.shape[0] == (y_pred_n.shape[0] + 2)
+
+    # test that during prediction a warning is issued informing that null rows
+    # were removed. the message gives the indexes of the rows removed
+    # and the caller can use those indexes for a correct comparation between
+    # y_test and y_predict
+    assert_warns(UserWarning, dr2.predict, X_test_n)
 
 def test_output_format():
     from sklearn.datasets import load_iris
@@ -369,12 +404,35 @@ def test_output_format():
     y = (iris.target != 2).astype(int)
     X_train, X_test, y_train, y_test = train_test_split(df, y, random_state=0)
 
+    dr = DrLogisticRegression()
+    dr.fit(X_train, y_train)
 
-# uni can handle new category levels  at prediction time
+    y_pred = dr.predict(X_test)
+    assert y_pred.shape[0] == y_test.shape[0]
+
+    proba = dr.predict_proba(X_test)
+    assert proba.shape[0] == y_test.shape[0]
+    assert proba.shape[1] == 2
+
+    eva = dr.evaluate(X_test, y_test)
+    assert 'f1_score' in eva
+    assert 'logloss' in eva
+
+    tune = dr.tune_parameters(X_test, y_test)
+    for k in tune.keys():
+        one_fold = tune[k]
+        assert 'fit_intercept' in one_fold
+        assert 'solver' in one_fold
+        assert 'tol' in one_fold
+        assert 'scores' in one_fold
+        assert 'f1_score' in one_fold['scores']
+        assert 'logloss' in one_fold['scores']
+
+
+# unit can handle new category levels  at prediction time
 # other useful unitest you can think of if time allows
-
 if __name__ == '__main__':
     #lending_club_demo()
-    #test_reproducible()
+    test_reproducible()
     test_nulls()
-    print('end')
+    test_output_format()
